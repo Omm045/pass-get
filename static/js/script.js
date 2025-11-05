@@ -2,6 +2,7 @@ class PasswordGenerator {
     constructor() {
         this.initializeElements();
         this.attachEventListeners();
+        this.loadTheme();
         this.updateLengthDisplay();
         this.generatePassword();
     }
@@ -11,7 +12,9 @@ class PasswordGenerator {
         this.generateBtn = document.getElementById('generateBtn');
         this.refreshBtn = document.getElementById('refreshBtn');
         this.copyBtn = document.getElementById('copyBtn');
+        this.downloadBtn = document.getElementById('downloadBtn');
         this.checkStrengthBtn = document.getElementById('checkStrengthBtn');
+        this.themeSelect = document.getElementById('themeSelect');
         
         // Password display
         this.passwordField = document.getElementById('generatedPassword');
@@ -47,8 +50,12 @@ class PasswordGenerator {
         this.generateBtn.addEventListener('click', () => this.generatePassword());
         this.refreshBtn.addEventListener('click', () => this.generatePassword());
         
-        // Copy password
+        // Copy and download password
         this.copyBtn.addEventListener('click', () => this.copyPassword());
+        this.downloadBtn.addEventListener('click', () => this.downloadPassword());
+        
+        // Theme selection
+        this.themeSelect.addEventListener('change', () => this.changeTheme());
         
         // Length slider
         this.lengthSlider.addEventListener('input', () => this.updateLengthDisplay());
@@ -89,6 +96,30 @@ class PasswordGenerator {
                 this.closeModal();
             }
         });
+    }
+
+    loadTheme() {
+        const savedTheme = localStorage.getItem('passgen-theme') || 'blue';
+        this.themeSelect.value = savedTheme;
+        this.applyTheme(savedTheme);
+    }
+
+    changeTheme() {
+        const selectedTheme = this.themeSelect.value;
+        this.applyTheme(selectedTheme);
+        localStorage.setItem('passgen-theme', selectedTheme);
+    }
+
+    applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        
+        // Update theme-specific colors for length value background
+        const lengthValue = document.getElementById('lengthValue');
+        if (lengthValue) {
+            const root = getComputedStyle(document.documentElement);
+            const primaryColor = root.getPropertyValue('--primary-color').trim();
+            lengthValue.style.background = `${primaryColor}1a`; // Add alpha
+        }
     }
 
     updateLengthDisplay() {
@@ -176,6 +207,45 @@ class PasswordGenerator {
         }
     }
 
+    downloadPassword() {
+        const password = this.passwordField.value;
+        
+        if (!password) {
+            this.showNotification('No password to download', 'error');
+            return;
+        }
+        
+        try {
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `password-${timestamp}.txt`;
+            
+            const content = `Generated Password: ${password}\n\nGenerated on: ${new Date().toLocaleString()}\nLength: ${password.length} characters\n\nSecurity Note: Store this password securely and do not share it with others.`;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            this.showNotification('Password downloaded successfully!');
+            
+            // Visual feedback
+            this.downloadBtn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+                this.downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
+            }, 2000);
+            
+        } catch (error) {
+            console.error('Failed to download password:', error);
+            this.showNotification('Failed to download password', 'error');
+        }
+    }
+
     updateStrengthMeter(strength) {
         const percentage = strength.score;
         const color = strength.color;
@@ -206,7 +276,7 @@ class PasswordGenerator {
     showModal() {
         this.modal.classList.add('show');
         this.customPassword.value = '';
-        this.customStrengthResult.innerHTML = '<p style="color: #64748b; text-align: center;">Enter a password above to analyze its strength</p>';
+        this.customStrengthResult.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">Enter a password above to analyze its strength</p>';
         setTimeout(() => this.customPassword.focus(), 100);
     }
 
@@ -220,7 +290,7 @@ class PasswordGenerator {
         const password = this.customPassword.value.trim();
         
         if (!password) {
-            this.customStrengthResult.innerHTML = '<p style="color: #ef4444;">Please enter a password to analyze</p>';
+            this.customStrengthResult.innerHTML = '<p style="color: var(--danger-color);">Please enter a password to analyze</p>';
             return;
         }
         
@@ -241,12 +311,12 @@ class PasswordGenerator {
             if (data.success) {
                 this.displayCustomStrengthResult(data.strength);
             } else {
-                this.customStrengthResult.innerHTML = `<p style="color: #ef4444;">${data.error}</p>`;
+                this.customStrengthResult.innerHTML = `<p style="color: var(--danger-color);">${data.error}</p>`;
             }
             
         } catch (error) {
             console.error('Error analyzing password:', error);
-            this.customStrengthResult.innerHTML = '<p style="color: #ef4444;">Failed to analyze password</p>';
+            this.customStrengthResult.innerHTML = '<p style="color: var(--danger-color);">Failed to analyze password</p>';
         } finally {
             this.analyzeBtn.disabled = false;
             this.analyzeBtn.innerHTML = 'Analyze Password';
@@ -256,19 +326,19 @@ class PasswordGenerator {
     displayCustomStrengthResult(strength) {
         const feedbackHtml = strength.feedback.length > 0 
             ? `<div style="margin-top: 1rem;">
-                <h4 style="color: #1e293b; margin-bottom: 0.5rem; font-size: 0.9rem;">Recommendations:</h4>
-                <ul style="margin: 0; padding-left: 1.25rem; color: #64748b; font-size: 0.85rem;">
+                <h4 style="color: var(--text-primary); margin-bottom: 0.5rem; font-size: 0.9rem;">Recommendations:</h4>
+                <ul style="margin: 0; padding-left: 1.25rem; color: var(--text-secondary); font-size: 0.85rem;">
                     ${strength.feedback.map(item => `<li style="margin-bottom: 0.25rem;">${item}</li>`).join('')}
                 </ul>
             </div>`
-            : '<p style="color: #22c55e; margin-top: 1rem; font-size: 0.9rem;">✓ Excellent password strength!</p>';
+            : '<p style="color: var(--success-color); margin-top: 1rem; font-size: 0.9rem;">✓ Excellent password strength!</p>';
         
         this.customStrengthResult.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
                 <span style="font-weight: 600; color: ${strength.color}; font-size: 1rem;">${strength.strength}</span>
-                <span style="color: #64748b; font-size: 0.9rem;">${strength.score}/100</span>
+                <span style="color: var(--text-secondary); font-size: 0.9rem;">${strength.score}/100</span>
             </div>
-            <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-bottom: 0.5rem;">
+            <div style="width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; margin-bottom: 0.5rem;">
                 <div style="height: 100%; width: ${strength.score}%; background: ${strength.color}; border-radius: 4px; transition: all 0.3s ease;"></div>
             </div>
             ${feedbackHtml}
@@ -286,10 +356,10 @@ class PasswordGenerator {
         
         // Update notification style based on type
         if (type === 'error') {
-            this.notification.style.background = '#ef4444';
+            this.notification.style.background = 'var(--danger-color)';
             this.notification.querySelector('i').className = 'fas fa-exclamation-circle';
         } else {
-            this.notification.style.background = '#22c55e';
+            this.notification.style.background = 'var(--success-color)';
             this.notification.querySelector('i').className = 'fas fa-check-circle';
         }
         

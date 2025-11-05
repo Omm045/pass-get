@@ -1,4 +1,5 @@
 :root {
+    /* Blue Theme (Default) */
     --primary-color: #2563eb;
     --primary-hover: #1d4ed8;
     --secondary-color: #64748b;
@@ -19,6 +20,51 @@
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* Dark Theme */
+[data-theme="dark"] {
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+    --secondary-color: #94a3b8;
+    --background-color: #0f172a;
+    --card-background: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border-color: #334155;
+    --success-color: #22c55e;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+}
+
+/* Purple Theme */
+[data-theme="purple"] {
+    --primary-color: #7c3aed;
+    --primary-hover: #6d28d9;
+    --secondary-color: #64748b;
+    --background-color: #faf5ff;
+    --card-background: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #e9d5ff;
+    --success-color: #22c55e;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+}
+
+/* Green Theme */
+[data-theme="green"] {
+    --primary-color: #059669;
+    --primary-hover: #047857;
+    --secondary-color: #64748b;
+    --background-color: #f0fdf4;
+    --card-background: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #bbf7d0;
+    --success-color: #22c55e;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -27,10 +73,11 @@
 
 body {
     font-family: var(--font-family);
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    background: linear-gradient(135deg, var(--background-color) 0%, var(--border-color) 100%);
     color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
+    transition: all 0.3s ease;
 }
 
 .container {
@@ -48,12 +95,19 @@ body {
     margin-bottom: 3rem;
 }
 
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
 .logo {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 0.75rem;
-    margin-bottom: 0.5rem;
 }
 
 .logo i {
@@ -65,10 +119,47 @@ body {
 .logo h1 {
     font-size: 2.5rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--primary-color), #1e40af);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.theme-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--card-background);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.theme-selector label {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.theme-dropdown {
+    background: var(--card-background);
+    color: var(--text-primary);
+    border: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    outline: none;
+}
+
+.theme-dropdown:focus {
+    box-shadow: 0 0 0 2px var(--primary-color);
 }
 
 .subtitle {
@@ -123,12 +214,12 @@ body {
 
 .password-field input {
     width: 100%;
-    padding: 1rem 4rem 1rem 1rem;
+    padding: 1rem 5rem 1rem 1rem;
     border: 2px solid var(--border-color);
     border-radius: var(--radius-sm);
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     font-size: 1rem;
-    background: #fafbfc;
+    background: var(--background-color);
     color: var(--text-primary);
     transition: all 0.2s ease;
 }
@@ -159,6 +250,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 40px;
+    height: 40px;
 }
 
 .btn-icon:hover {
@@ -411,7 +504,7 @@ body {
     width: 60px;
     height: 60px;
     margin: 0 auto 1rem;
-    background: linear-gradient(135deg, var(--primary-color), #1e40af);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -527,6 +620,8 @@ body {
     border-radius: var(--radius-sm);
     font-size: 1rem;
     transition: all 0.2s ease;
+    background: var(--background-color);
+    color: var(--text-primary);
 }
 
 .input-group input:focus {
@@ -610,6 +705,11 @@ body {
         padding: 1rem;
     }
     
+    .header-top {
+        flex-direction: column;
+        text-align: center;
+    }
+    
     .logo h1 {
         font-size: 2rem;
     }
@@ -661,20 +761,26 @@ body {
     .notification.show {
         transform: translateY(0);
     }
-}
-
-@media (max-width: 480px) {
+    
     .password-field input {
-        padding: 0.875rem 3.5rem 0.875rem 0.875rem;
-        font-size: 0.9rem;
+        padding-right: 6rem;
     }
     
     .password-actions {
         flex-direction: column;
         gap: 0.125rem;
     }
+}
+
+@media (max-width: 480px) {
+    .password-field input {
+        padding: 0.875rem 7rem 0.875rem 0.875rem;
+        font-size: 0.9rem;
+    }
     
     .btn-icon {
         padding: 0.5rem;
+        width: 36px;
+        height: 36px;
     }
 }
