@@ -50,21 +50,6 @@
     --danger-color: #ef4444;
 }
 
-/* Green Theme */
-[data-theme="green"] {
-    --primary-color: #059669;
-    --primary-hover: #047857;
-    --secondary-color: #64748b;
-    --background-color: #f0fdf4;
-    --card-background: #ffffff;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --border-color: #bbf7d0;
-    --success-color: #22c55e;
-    --warning-color: #f59e0b;
-    --danger-color: #ef4444;
-}
-
 * {
     margin: 0;
     padding: 0;
