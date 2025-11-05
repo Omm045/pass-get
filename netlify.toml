@@ -1,0 +1,19 @@
+# Netlify configuration for Flask app served as a static build via a proxy.
+# If deploying a Python/Flask server, Netlify cannot run the server directly.
+# Use these settings only when exporting a static build. For a pure static SPA, uncomment below.
+
+# Redirect all routes to index.html (SPA behavior)
+[[redirects]]
+  from = "/generate"
+  to = "/"
+  status = 200
+
+[[redirects]]
+  from = "/check-strength"
+  to = "/"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
